@@ -107,11 +107,22 @@ def handler(job):
 
         # Executa o modelo de OCR na imagem
         try:
-            resultado_texto = model.infer(
+            # O modelo infer pode retornar um dicionário ou string
+            resultado = model.infer(
                 tokenizer,
                 prompt=prompt,
-                image_file=temp_image_path
+                image_file=temp_image_path,
+                base_size=1024,
+                image_size=640,
+                crop_mode=False
             )
+
+            # Verifica o tipo de retorno
+            if isinstance(resultado, dict):
+                resultado_texto = resultado.get('text', str(resultado))
+            else:
+                resultado_texto = str(resultado)
+
             print("Inferência concluída com sucesso!")
             print(f"Texto extraído: {len(resultado_texto)} caracteres")
 
