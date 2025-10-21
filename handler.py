@@ -105,16 +105,23 @@ def handler(job):
         print("\nIniciando inferência do OCR...")
         print("(Processando imagem com o modelo DeepSeek-OCR...)")
 
+        # Cria diretório temporário para output
+        output_dir = f"/tmp/output_{job['id']}"
+        os.makedirs(output_dir, exist_ok=True)
+
         # Executa o modelo de OCR na imagem
         try:
-            # O modelo infer pode retornar um dicionário ou string
+            # O modelo infer precisa de output_path obrigatoriamente
             resultado = model.infer(
                 tokenizer,
                 prompt=prompt,
                 image_file=temp_image_path,
+                output_path=output_dir,
                 base_size=1024,
                 image_size=640,
-                crop_mode=False
+                crop_mode=True,
+                save_results=False,
+                test_compress=False
             )
 
             # Verifica o tipo de retorno
