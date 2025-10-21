@@ -124,9 +124,24 @@ def handler(job):
                 test_compress=False
             )
 
+            # Debug: Imprime o tipo e valor do resultado
+            print(f"Tipo de retorno: {type(resultado)}")
+            print(f"Valor retornado: {resultado}")
+
             # Verifica o tipo de retorno
             if isinstance(resultado, dict):
                 resultado_texto = resultado.get('text', str(resultado))
+            elif resultado is None:
+                # O modelo pode salvar o resultado em arquivo
+                # Vamos ler o arquivo de saída
+                import glob
+                output_files = glob.glob(f"{output_dir}/*.txt")
+                if output_files:
+                    with open(output_files[0], 'r', encoding='utf-8') as f:
+                        resultado_texto = f.read()
+                    print(f"Texto lido do arquivo: {output_files[0]}")
+                else:
+                    resultado_texto = "Nenhum texto foi extraído (modelo retornou None)"
             else:
                 resultado_texto = str(resultado)
 
