@@ -112,6 +112,7 @@ def handler(job):
         # Executa o modelo de OCR na imagem
         try:
             # O modelo infer precisa de output_path obrigatoriamente
+            # Vamos tentar save_results=True para ver se salva em arquivo
             resultado = model.infer(
                 tokenizer,
                 prompt=prompt,
@@ -120,7 +121,7 @@ def handler(job):
                 base_size=1024,
                 image_size=640,
                 crop_mode=True,
-                save_results=False,
+                save_results=True,
                 test_compress=False
             )
 
