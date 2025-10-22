@@ -126,25 +126,41 @@ def handler(job):
             )
 
             # Debug: Imprime o tipo e valor do resultado
-            print(f"Tipo de retorno: {type(resultado)}")
-            print(f"Valor retornado: {resultado}")
+            print(f"DEBUG - Tipo de retorno: {type(resultado)}")
+            print(f"DEBUG - Valor retornado: {repr(resultado)}")
+
+            # Lista todos os arquivos no output_dir
+            import glob
+            all_files = glob.glob(f"{output_dir}/*")
+            print(f"DEBUG - Arquivos no output_dir: {all_files}")
 
             # Verifica o tipo de retorno
             if isinstance(resultado, dict):
                 resultado_texto = resultado.get('text', str(resultado))
+                print(f"DEBUG - Retorno é dict, texto extraído: {len(resultado_texto)} chars")
             elif resultado is None:
                 # O modelo pode salvar o resultado em arquivo
-                # Vamos ler o arquivo de saída
-                import glob
-                output_files = glob.glob(f"{output_dir}/*.txt")
+                # Vamos ler QUALQUER arquivo de saída
+                output_files = glob.glob(f"{output_dir}/*.*")
+                print(f"DEBUG - Modelo retornou None, procurando arquivos...")
+                print(f"DEBUG - Arquivos encontrados: {output_files}")
+
                 if output_files:
-                    with open(output_files[0], 'r', encoding='utf-8') as f:
-                        resultado_texto = f.read()
-                    print(f"Texto lido do arquivo: {output_files[0]}")
+                    # Tenta ler o primeiro arquivo encontrado
+                    try:
+                        with open(output_files[0], 'r', encoding='utf-8') as f:
+                            resultado_texto = f.read()
+                        print(f"DEBUG - Texto lido do arquivo {output_files[0]}: {len(resultado_texto)} chars")
+                    except Exception as e:
+                        print(f"DEBUG - Erro ao ler arquivo: {e}")
+                        resultado_texto = f"Erro ao ler arquivo: {e}"
                 else:
-                    resultado_texto = "Nenhum texto foi extraído (modelo retornou None)"
+                    print(f"DEBUG - Nenhum arquivo encontrado no output_dir")
+                    # Vamos tentar retornar o resultado como string mesmo sendo None
+                    resultado_texto = str(resultado) if resultado else "Nenhum texto foi extraído (modelo retornou None e não criou arquivos)"
             else:
                 resultado_texto = str(resultado)
+                print(f"DEBUG - Retorno é {type(resultado)}, convertido para string: {len(resultado_texto)} chars")
 
             print("Inferência concluída com sucesso!")
             print(f"Texto extraído: {len(resultado_texto)} caracteres")
